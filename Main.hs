@@ -1,7 +1,5 @@
 import Data.Default
-import Data.IORef
 import Data.Time.LocalTime
-import Data.Traversable (forM)
 import Text.ICalendar
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Map.Lazy as M
