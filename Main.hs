@@ -1,9 +1,12 @@
+{-# OPTIONS_GHC -Wall -fno-warn-incomplete-patterns #-}
+
 import Data.Default
 import Data.Time.LocalTime
 import Text.ICalendar
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Map.Lazy as M
 
+main :: IO ()
 main = do
     input <- L.getContents
     let Right ([cal], _) = parseICalendar def "stdin" input
@@ -30,11 +33,13 @@ fixEvents cal = cal{ vcEvents = es' }
 --
 -- Exchange does not set it to a correct effective value, it only sets the
 -- day, not time. This function fixes this.
+fixRecurId :: VEvent -> VEvent -> VEvent
 fixRecurId e@VEvent{ veRecurId = Just recId@RecurrenceIdDateTime{ recurrenceIdDateTime = recDT } }
-    e1@VEvent{ veDTStart = Just DTStartDateTime{ dtStartDateTimeValue = startDT } } =
+    VEvent{ veDTStart = Just DTStartDateTime{ dtStartDateTimeValue = startDT } } =
         e{ veRecurId = Just recId{ recurrenceIdDateTime = fixRecurTime recDT startDT } }
 fixRecurId e _ = e
 
+fixRecurTime :: DateTime -> DateTime -> DateTime
 fixRecurTime recDT@ZonedDateTime{ dateTimeFloating = recDTF }
-    startDT@ZonedDateTime{ dateTimeFloating = LocalTime{ localTimeOfDay = startTimeOfDay } } =
+    ZonedDateTime{ dateTimeFloating = LocalTime{ localTimeOfDay = startTimeOfDay } } =
         recDT{ dateTimeFloating = recDTF{ localTimeOfDay = startTimeOfDay } }
